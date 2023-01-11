@@ -18,7 +18,7 @@ export const appDataSource = new DataSource({
 appDataSource
   .initialize()
   .then(() => {
-    log.info("Data source has been initialized/");
+    log.info("Data source has been initialized.");
   })
   .catch((error) => {
     log.error("Error during Data source initialization:" + error);
