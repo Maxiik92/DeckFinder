@@ -1,0 +1,13 @@
+.wrapper {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  border: 3px solid red;
+  padding: 10px 30px;
+}
+
+.buttons {
+  display: flex;
+  gap: 5px;
+  border: 1px solid salmon;
+}
