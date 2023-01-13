@@ -2,9 +2,10 @@ import { ValidationError } from "joi";
 import { UserEntity } from "../../database";
 import { userSchema } from "./user-schema";
 import log from "../../logger";
-import { inputValidation } from "../index";
 import { UserRepository } from "../../repository/user-repository";
 import { CustomResponse } from "../../repository/custom-response";
+import { UpdateResult } from "typeorm";
+import bcrypt from "bcrypt";
 
 export class UserService {
   constructor(public userRepository: UserRepository) {}
@@ -51,10 +52,54 @@ export class UserService {
         data: [],
       };
     }
+    delete foundUser.password;
     return {
       status: 200,
       message: "OK",
       data: foundUser,
+    };
+  }
+
+  async updateUser(user: UserEntity, userId: number): Promise<CustomResponse> {
+    const updatedUser: UpdateResult = await this.userRepository.updateUser(
+      user,
+      userId
+    );
+    return this.successfullUpdateCheck(updatedUser);
+  }
+
+  async checkPassword(password: string, id: number) {
+    const foundUser = await this.userRepository.findUserById(id);
+    if (foundUser == null) {
+      return {
+        status: 400,
+        message: "User with provided id do not exist.",
+        data: [],
+      };
+    }
+    return await bcrypt.compare(password, foundUser.password as string);
+  }
+
+  async updateUserPassword(newPassword: string, id: number) {
+    const updatedPassword = await this.userRepository.updateUserPassword(
+      newPassword,
+      id
+    );
+    return this.successfullUpdateCheck(updatedPassword);
+  }
+
+  successfullUpdateCheck(update: UpdateResult): CustomResponse {
+    if (update.affected! < 1) {
+      return {
+        status: 500,
+        message: "Updating was not successfull.",
+        data: [],
+      };
+    }
+    return {
+      status: 200,
+      message: "OK",
+      data: [],
     };
   }
 }
