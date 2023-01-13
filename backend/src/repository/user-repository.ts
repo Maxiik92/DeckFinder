@@ -19,4 +19,16 @@ export class UserRepository implements IUserRepository {
 
     return appDataSource.getRepository(UserEntity).save(newUser);
   }
+
+  async checkUser(userName: string): Promise<UserEntity | null> {
+    return appDataSource.getRepository(UserEntity).findOneBy({
+      name: userName,
+    });
+  }
+
+  async findUserById(userId: number): Promise<UserEntity | null> {
+    return appDataSource.getRepository(UserEntity).findOneBy({
+      id: userId,
+    });
+  }
 }

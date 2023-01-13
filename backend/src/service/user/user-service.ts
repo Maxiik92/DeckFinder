@@ -23,7 +23,38 @@ export class UserService {
       }
     }
     const newUser = await this.userRepository.createUser(user);
-
     return { status: 200, message: "OK", data: newUser };
+  }
+
+  async checkUser(userName: string): Promise<CustomResponse> {
+    const checkedUser = await this.userRepository.checkUser(userName);
+    if (checkedUser !== null) {
+      return {
+        status: 400,
+        message: "UserName allready in use.",
+        data: [],
+      };
+    }
+    return {
+      status: 200,
+      message: "OK",
+      data: [],
+    };
+  }
+
+  async getUser(userId: number): Promise<CustomResponse> {
+    const foundUser = await this.userRepository.findUserById(userId);
+    if (foundUser == null) {
+      return {
+        status: 400,
+        message: "User with provided id do not exist.",
+        data: [],
+      };
+    }
+    return {
+      status: 200,
+      message: "OK",
+      data: foundUser,
+    };
   }
 }

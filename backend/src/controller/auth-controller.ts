@@ -10,6 +10,11 @@ export class AuthController {
     this._router.post("/create", async (req: Request, res: Response) => {
       log.info("Create user endpoint accessed.");
       const user: UserEntity = req.body as UserEntity;
+      const checkedUser = await this.userService.checkUser(req.body.name);
+      if (checkedUser.status == 400) {
+        res.json(checkedUser);
+        return;
+      }
       res.json(await this.userService.createUser(user));
     });
   }
