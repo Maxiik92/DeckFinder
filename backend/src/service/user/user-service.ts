@@ -19,11 +19,12 @@ export class UserService {
         return {
           status: 422,
           message: "Input provided is not valid.",
-          data: [],
+          data: {},
         };
       }
     }
     const newUser = await this.userRepository.createUser(user);
+    delete newUser.password;
     return { status: 200, message: "OK", data: newUser };
   }
 
@@ -33,13 +34,13 @@ export class UserService {
       return {
         status: 400,
         message: "UserName allready in use.",
-        data: [],
+        data: {},
       };
     }
     return {
       status: 200,
       message: "OK",
-      data: [],
+      data: {},
     };
   }
 
@@ -49,7 +50,7 @@ export class UserService {
       return {
         status: 400,
         message: "User with provided id do not exist.",
-        data: [],
+        data: {},
       };
     }
     delete foundUser.password;
@@ -74,7 +75,7 @@ export class UserService {
       return {
         status: 400,
         message: "User with provided id do not exist.",
-        data: [],
+        data: {},
       };
     }
     return await bcrypt.compare(password, foundUser.password as string);
@@ -93,13 +94,22 @@ export class UserService {
       return {
         status: 500,
         message: "Updating was not successfull.",
-        data: [],
+        data: {},
       };
     }
     return {
       status: 200,
       message: "OK",
-      data: [],
+      data: {},
     };
+  }
+
+  async deleteUser(id: number): Promise<CustomResponse> {
+    const deletedUser = await this.userRepository.deleteUser(id);
+    if (deletedUser !== null) {
+      if (deletedUser.affected! > 0)
+        return { status: 204, message: "OK", data: {} };
+    }
+    return { status: 500, message: "Delete was not successfull", data: {} };
   }
 }

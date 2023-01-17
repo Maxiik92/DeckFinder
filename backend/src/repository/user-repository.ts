@@ -1,4 +1,4 @@
-import { UpdateResult } from "typeorm";
+import { DeleteResult, UpdateResult } from "typeorm";
 import { appDataSource } from "../database";
 import { UserEntity } from "../database";
 import { genSaltSync, hashSync } from "bcrypt";
@@ -48,6 +48,15 @@ export class UserRepository implements IUserRepository {
     return appDataSource.getRepository(UserEntity).update(id, {
       password: hash,
     });
+  }
+
+  async deleteUser(id: number): Promise<DeleteResult> {
+    return appDataSource
+      .createQueryBuilder()
+      .delete()
+      .from(UserEntity)
+      .where("id=:id", { id: id })
+      .execute();
   }
 
   passwordHashing(password: string): string {
