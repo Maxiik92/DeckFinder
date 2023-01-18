@@ -1,35 +1,95 @@
 <div class="wrapper">
-  <div class="sign-up">
-    <div class="register">
-      <h2 class="title">Sign up</h2>
-      <form class="reg-form">
-        <div class="grouo">
-          <label for="name">Name</label>
-          <input type="text" id="name" required placeholder="Enter name" />
-        </div>
-        <div class="group">
-          <label for="mai">Mail</label>
-          <input type="email" id="mail" required placeholder="Enter E-Mail" />
-        </div>
-        <div class="group">
-          <label for="pass">Password</label>
-          <input
-            type="password"
-            id="pass"
-            required
-            placeholder="Enter Password"
-          />
-        </div>
-        <div class="group">
-          <label for="re-pass">Re-type Password</label>
-          <input
-            type="password"
-            id="re-pass"
-            required
-            placeholder="Repeat Password"
-          />
-        </div>
-      </form>
+  <div *ngIf="!submited" class="register">
+    <h2 class="title">Sign up</h2>
+    <form class="reg-form" #regForm="ngForm" (ngSubmit)="onSubmit(regForm)">
+      <div class="group">
+        <label for="name"><mat-icon>account_box</mat-icon></label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          ngModel
+          #name="ngModel"
+          required
+          placeholder="Enter name"
+          minlength="4"
+        />
+      </div>
+      <p class="invalid-input" *ngIf="!name.valid && name.touched">
+        User name has to be at least 4 characters long!
+      </p>
+      <p class="invalid-input" *ngIf="nameUsed">User name is already in use!</p>
+      <div class="group">
+        <label for="mail"><mat-icon>alternate_email</mat-icon></label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          ngModel
+          #email="ngModel"
+          required
+          email
+          placeholder="Enter E-Mail: email@example.test"
+        />
+      </div>
+      <p class="invalid-input" *ngIf="!email.valid && email.touched">
+        Please enter a valid e-mail!
+      </p>
+      <div class="group">
+        <label for="pass"><mat-icon>lock</mat-icon></label>
+        <input
+          [type]="attribute"
+          id="pass"
+          name="pass"
+          ngModel
+          #pass="ngModel"
+          required
+          minlength="8"
+          placeholder="Enter Password ( 8 characters )"
+        />
+      </div>
+      <p class="invalid-input" *ngIf="!pass.valid && pass.touched">
+        Password has to be at least 8 characters long !
+      </p>
+      <div class="group">
+        <label for="repass"><mat-icon>lock_open</mat-icon></label>
+        <input
+          [type]="attribute"
+          id="repass"
+          name="repass"
+          ngModel
+          #repass="ngModel"
+          required
+          minlength="8"
+          placeholder="Repeat Password"
+        />
+      </div>
+      <p
+        class="invalid-input"
+        *ngIf="pass.valid && pass.value != repass.value && repass.dirty"
+      >
+        Both passwords have to match !
+      </p>
+      <div class="pass-visibility">
+        <p>Show Password</p>
+        <mat-icon *ngIf="!showPassword" (click)="togglePasswordVisibility()"
+          >visibility</mat-icon
+        >
+        <mat-icon *ngIf="showPassword" (click)="togglePasswordVisibility()"
+          >visibility_off</mat-icon
+        >
+      </div>
+      <button class="submit-button" type="submit" [disabled]="!regForm.valid">
+        SUBMIT
+      </button>
+    </form>
+    <div class="login-redirect">
+      <p>Already member? Login <span>here!</span></p>
     </div>
+  </div>
+  <div class="submited" *ngIf="submited">
+    <h2>Account created!</h2>
+    <p>Log In <span>here!</span></p>
+    <p>Or return to &#9758;<span routerLink="/"> homepage</span></p>
   </div>
 </div>

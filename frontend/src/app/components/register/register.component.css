@@ -1,0 +1,104 @@
+.wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.register {
+  border: 1px solid black;
+  margin: auto;
+  min-height: 80%;
+  min-width: 40%;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.title,
+.submited h2 {
+  padding: 10px;
+  font-size: 2em;
+  font-weight: bold;
+}
+
+.reg-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.group {
+  width: 80%;
+  margin: 10px auto;
+  padding: 10px;
+  display: flex;
+}
+
+.group label {
+  display: flex;
+  margin: auto;
+  padding-right: 15px;
+}
+
+.group input {
+  width: 100%;
+  padding: 3px 10px;
+  border: 1px solid grey;
+}
+
+.pass-visibility {
+  display: flex;
+  gap: 30px;
+  margin: 5px auto;
+}
+
+.pass-visibility p {
+  margin: auto;
+}
+
+.pass-visibility mat-icon {
+  cursor: pointer;
+}
+
+.submit-button {
+  padding: 10px;
+  margin: 20px auto;
+  border: 1px solid black;
+}
+
+.submit-button:hover {
+  cursor: pointer;
+  background-color: rgba(128, 128, 128, 0.545);
+}
+
+.submit-button:disabled {
+  background-color: #444;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+.login-redirect {
+  padding: 20px;
+  text-align: center;
+}
+
+.login-redirect span,
+.submited span {
+  cursor: pointer;
+  color: blue;
+  font-weight: bold;
+}
+
+.submited {
+  border: 1px solid black;
+  margin: auto;
+  min-height: 80%;
+  min-width: 40%;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
