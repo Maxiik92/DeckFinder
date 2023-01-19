@@ -1,5 +1,5 @@
-export interface CustomResponse {
+export interface CustomResponse<T> {
   status: number;
   message: string;
-  data: any;
+  data: T;
 }

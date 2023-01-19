@@ -1,8 +1,12 @@
 import { BaseEntity } from "../entity/baseEntity";
-import {DeepPartial} from "typeorm";
+import { DeepPartial, FindOptionsWhere } from "typeorm";
 
-export class Filter<T extends BaseEntity> {
-    public pageSize?: number;
-    public page?: number;
-    public data?: T;
+export interface IFilterable<T> {
+  getAsKeyValue(): FindOptionsWhere<T>; // return key value type
+}
+
+export class Filter<T extends IFilterable<T>> {
+  public pageSize?: number;
+  public page?: number;
+  public data?: T;
 }

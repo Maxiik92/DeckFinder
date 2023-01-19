@@ -6,11 +6,12 @@ import { UserRepository } from "../../repository/user-repository";
 import { CustomResponse } from "../../repository/custom-response";
 import { UpdateResult } from "typeorm";
 import bcrypt from "bcrypt";
+import { genSaltSync, hashSync } from "bcrypt";
 
 export class UserService {
   constructor(public userRepository: UserRepository) {}
 
-  async createUser(user: UserEntity): Promise<CustomResponse> {
+  async createUser(user: UserEntity): Promise<CustomResponse<UserEntity>> {
     try {
       await userSchema.validateAsync(user);
     } catch (err) {
@@ -23,12 +24,13 @@ export class UserService {
         };
       }
     }
-    const newUser = await this.userRepository.createUser(user);
+    user.password = this.passwordHashing(user.password!);
+    const newUser = await this.userRepository.create(user);
     delete newUser.password;
     return { status: 200, message: "OK", data: newUser };
   }
 
-  async checkUser(userName: string): Promise<CustomResponse> {
+  async checkUser(userName: string): Promise<CustomResponse<UserEntity>> {
     const checkedUser = await this.userRepository.checkUser(userName);
     if (checkedUser !== null) {
       return {
@@ -44,8 +46,8 @@ export class UserService {
     };
   }
 
-  async getUser(userId: number): Promise<CustomResponse> {
-    const foundUser = await this.userRepository.findUserById(userId);
+  async getUser(userId: number): Promise<CustomResponse<UserEntity>> {
+    const foundUser = await this.userRepository.getById(userId);
     if (foundUser == null) {
       return {
         status: 400,
@@ -61,16 +63,16 @@ export class UserService {
     };
   }
 
-  async updateUser(user: UserEntity, userId: number): Promise<CustomResponse> {
-    const updatedUser: UpdateResult = await this.userRepository.updateUser(
-      user,
-      userId
-    );
-    return this.successfullUpdateCheck(updatedUser);
+  async updateUser(
+    user: UserEntity,
+    userId: number
+  ): Promise<CustomResponse<UserEntity>> {
+    const update: UpdateResult = await this.userRepository.update(userId, user);
+    return this.successfullUpdateCheck(update);
   }
 
   async checkPassword(password: string, id: number) {
-    const foundUser = await this.userRepository.findUserById(id);
+    const foundUser = await this.userRepository.getById(id);
     if (foundUser == null) {
       return {
         status: 400,
@@ -81,15 +83,13 @@ export class UserService {
     return await bcrypt.compare(password, foundUser.password as string);
   }
 
-  async updateUserPassword(newPassword: string, id: number) {
-    const updatedPassword = await this.userRepository.updateUserPassword(
-      newPassword,
-      id
-    );
-    return this.successfullUpdateCheck(updatedPassword);
+  async updateUserPassword(password: string, id: number) {
+    const newPassword = { password: this.passwordHashing(password) };
+    const update = await this.userRepository.update(id, newPassword);
+    return this.successfullUpdateCheck(update);
   }
 
-  successfullUpdateCheck(update: UpdateResult): CustomResponse {
+  successfullUpdateCheck(update: UpdateResult): CustomResponse<UserEntity> {
     if (update.affected! < 1) {
       return {
         status: 500,
@@ -104,12 +104,18 @@ export class UserService {
     };
   }
 
-  async deleteUser(id: number): Promise<CustomResponse> {
-    const deletedUser = await this.userRepository.deleteUser(id);
+  async deleteUser(id: number): Promise<CustomResponse<{}>> {
+    const deletedUser = await this.userRepository.deleteById(id);
     if (deletedUser !== null) {
       if (deletedUser.affected! > 0)
         return { status: 204, message: "OK", data: {} };
     }
     return { status: 500, message: "Delete was not successfull", data: {} };
+  }
+
+  passwordHashing(password: string): string {
+    const saltRounds = 10;
+    const salt = genSaltSync(saltRounds);
+    return hashSync(password!, salt);
   }
 }
