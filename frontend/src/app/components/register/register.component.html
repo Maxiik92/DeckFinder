@@ -45,7 +45,7 @@
           #pass="ngModel"
           required
           minlength="8"
-          placeholder="Enter Password ( 8 characters )"
+          placeholder="Enter Password ( minimum 8 characters )"
         />
       </div>
       <p class="invalid-input" *ngIf="!pass.valid && pass.touched">
@@ -84,7 +84,7 @@
       </button>
     </form>
     <div class="login-redirect">
-      <p>Already member? Login <span>here!</span></p>
+      <p>Already member? Login <span routerLink="/login">here!</span></p>
     </div>
   </div>
   <div class="submited" *ngIf="submited">

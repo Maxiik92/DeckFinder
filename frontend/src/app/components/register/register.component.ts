@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { CustomResponse } from 'src/app/interface/custom-response';
+import { CustomResponse } from 'src/app/interface/response';
 import { Register } from 'src/app/interface/register';
 import { AuthService } from 'src/app/service/auth/auth.service';
 @Component({

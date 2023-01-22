@@ -1,0 +1,51 @@
+<div class="wrapper">
+  <div class="login">
+    <h2 class="title">Log In</h2>
+    <form
+      class="login-form"
+      #loginForm="ngForm"
+      (ngSubmit)="onSubmit(loginForm)"
+    >
+      <div class="group">
+        <label for="login"><mat-icon>account_box</mat-icon></label>
+        <input
+          type="text"
+          id="login"
+          name="login"
+          ngModel
+          #login="ngModel"
+          required
+          placeholder="Enter User Name or E-Mail address"
+        />
+      </div>
+      <div class="group">
+        <label for="pass"><mat-icon>lock</mat-icon></label>
+        <input
+          [type]="attribute"
+          id="pass"
+          name="pass"
+          ngModel
+          #pass="ngModel"
+          required
+          minlength="8"
+          placeholder="Enter Password ( minimum 8 characters )"
+        />
+      </div>
+      <div class="pass-visibility">
+        <p>Show Password</p>
+        <mat-icon *ngIf="!showPassword" (click)="togglePasswordVisibility()"
+          >visibility</mat-icon
+        >
+        <mat-icon *ngIf="showPassword" (click)="togglePasswordVisibility()"
+          >visibility_off</mat-icon
+        >
+      </div>
+      <button class="submit-button" type="submit" [disabled]="!loginForm.valid">
+        SUBMIT
+      </button>
+    </form>
+    <p class="redirect">
+      Not a member yet? Register <span routerLink="/register">here!</span>
+    </p>
+  </div>
+</div>
