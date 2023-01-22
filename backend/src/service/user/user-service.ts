@@ -3,10 +3,11 @@ import { UserEntity } from "../../database";
 import { userSchema } from "./user-schema";
 import log from "../../logger";
 import { UserRepository } from "../../repository/user-repository";
-import { CustomResponse } from "../../repository/custom-response";
+import { CustomResponse } from "../../interfaces/custom-response";
 import { UpdateResult } from "typeorm";
 import bcrypt from "bcrypt";
 import { genSaltSync, hashSync } from "bcrypt";
+import { Login } from "../../interfaces/login";
 
 export class UserService {
   constructor(public userRepository: UserRepository) {}
@@ -46,7 +47,7 @@ export class UserService {
     };
   }
 
-  async getUser(userId: number): Promise<CustomResponse<UserEntity>> {
+  async getUserbyId(userId: number): Promise<CustomResponse<UserEntity>> {
     const foundUser = await this.userRepository.getById(userId);
     if (foundUser == null) {
       return {
@@ -61,6 +62,11 @@ export class UserService {
       message: "OK",
       data: foundUser,
     };
+  }
+
+  async getUserByLogin(login: Login): Promise<UserEntity | null> {
+    const loginType = this.checkIfItsAnEmailOrUserName(login.login);
+    return await this.userRepository.getUser(loginType, login);
   }
 
   async updateUser(
@@ -117,5 +123,14 @@ export class UserService {
     const saltRounds = 10;
     const salt = genSaltSync(saltRounds);
     return hashSync(password!, salt);
+  }
+
+  checkIfItsAnEmailOrUserName(loginType: string): string {
+    const emailRegexp: RegExp =
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    if (loginType.match(emailRegexp)) {
+      return "email";
+    }
+    return "name";
   }
 }

@@ -1,5 +1,5 @@
 import { Repository, EntityTarget, DeleteResult, UpdateResult } from "typeorm";
-import { appDataSource, UserEntity } from "../database";
+import { appDataSource } from "../database";
 import { BaseEntity } from "../database/entity/baseEntity";
 import { Filter } from "../database/common/filterable";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";

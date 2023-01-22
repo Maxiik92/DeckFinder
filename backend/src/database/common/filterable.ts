@@ -1,5 +1,4 @@
-import { BaseEntity } from "../entity/baseEntity";
-import { DeepPartial, FindOptionsWhere } from "typeorm";
+import { FindOptionsWhere } from "typeorm";
 
 export interface IFilterable<T> {
   getAsKeyValue(): FindOptionsWhere<T>; // return key value type

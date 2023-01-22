@@ -3,8 +3,6 @@ import { UserRepository } from "../repository/user-repository";
 import { UserService } from "../service/user/user-service";
 import { AuthController } from "../controller/auth-controller";
 import { UserController } from "../controller/user-controller";
-import { GenericRepository } from "../repository/generic-repository";
-import { UserEntity } from "../database";
 
 const userRouter = Router();
 const authRouter = Router();

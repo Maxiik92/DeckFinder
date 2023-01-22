@@ -31,7 +31,7 @@ export class UserController {
       }
 
       const id = parseInt(userId);
-      res.json(await this.userService.getUser(id));
+      res.json(await this.userService.getUserbyId(id));
     });
 
     this._router.patch("/update/:id", async (req: Request, res: Response) => {
@@ -73,7 +73,7 @@ export class UserController {
         }
 
         const id = parseInt(userId);
-        const passwordCheck = await this.checkPassword(
+        const passwordCheck = await this.userService.checkPassword(
           req.body.oldPassword,
           id
         );
@@ -120,7 +120,10 @@ export class UserController {
         return;
       }
       const id = parseInt(req.params.id);
-      const passwordCheck = await this.checkPassword(req.body.password, id);
+      const passwordCheck = await this.userService.checkPassword(
+        req.body.password,
+        id
+      );
       //if password is not valid cannot proceed
       if (!passwordCheck) {
         res.json({
@@ -133,10 +136,6 @@ export class UserController {
       res.json(await this.userService.deleteUser(id));
       return;
     });
-  }
-
-  async checkPassword(password: string, id: number) {
-    return await this.userService.checkPassword(password, id);
   }
 
   get router(): Router {

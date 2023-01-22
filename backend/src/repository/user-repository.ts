@@ -1,6 +1,5 @@
-import { DeleteResult, UpdateResult } from "typeorm";
-import { appDataSource } from "../database";
 import { UserEntity } from "../database";
+import { Login } from "../interfaces/login";
 import { GenericRepository } from "./generic-repository";
 
 export class UserRepository extends GenericRepository<UserEntity> {
@@ -14,10 +13,11 @@ export class UserRepository extends GenericRepository<UserEntity> {
       .where(`user.name = :name`, { name: userName })
       .getOne();
   }
-
-  // async findUserById(userId: number): Promise<UserEntity | null> {
-  //   return this.repository.findOneBy({
-  //     id: userId,
-  //   });
-  // }
+  //.where(`user.${logintype} =:${logintype}`,{`${logintype}`:login.login})
+  async getUser(logintype: string, login: Login): Promise<UserEntity | null> {
+    return this.repository
+      .createQueryBuilder("user")
+      .where(`user.${logintype}=:${logintype}`, { [logintype]: login.login })
+      .getOne();
+  }
 }
