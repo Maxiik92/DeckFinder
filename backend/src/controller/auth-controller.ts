@@ -23,16 +23,7 @@ export class AuthController {
     this._router.post("/login", async (req: Request, res: Response) => {
       log.info("Login user endpoint accessed.");
       const login: Login = req.body;
-      const foundUser = await this.userService.getUserByLogin(login);
-      if (!foundUser) {
-        res.json({
-          status: 400,
-          message: "User Name/ Email not found.",
-          data: {},
-        });
-        return;
-      }
-      this.passwordCheck(req, res, foundUser);
+      res.json(await this.userService.login(login));
     });
   }
 

@@ -1,5 +1,4 @@
 import { UserEntity } from "../database";
-import { Login } from "../interfaces/login";
 import { GenericRepository } from "./generic-repository";
 
 export class UserRepository extends GenericRepository<UserEntity> {
@@ -13,11 +12,11 @@ export class UserRepository extends GenericRepository<UserEntity> {
       .where(`user.name = :name`, { name: userName })
       .getOne();
   }
-  //.where(`user.${logintype} =:${logintype}`,{`${logintype}`:login.login})
-  async getUser(logintype: string, login: Login): Promise<UserEntity | null> {
+  // user can login via email/username and service decides what type is it
+  async getUser(logintype: string, input: string): Promise<UserEntity | null> {
     return this.repository
       .createQueryBuilder("user")
-      .where(`user.${logintype}=:${logintype}`, { [logintype]: login.login })
+      .where(`user.${logintype}=:${logintype}`, { [logintype]: input })
       .getOne();
   }
 }

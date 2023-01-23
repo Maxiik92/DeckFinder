@@ -8,6 +8,8 @@ import { UpdateResult } from "typeorm";
 import bcrypt from "bcrypt";
 import { genSaltSync, hashSync } from "bcrypt";
 import { Login } from "../../interfaces/login";
+import jwt from "jsonwebtoken";
+import config from "../../../config/config";
 
 export class UserService {
   constructor(public userRepository: UserRepository) {}
@@ -64,9 +66,22 @@ export class UserService {
     };
   }
 
-  async getUserByLogin(login: Login): Promise<UserEntity | null> {
+  async login(login: Login): Promise<CustomResponse<UserEntity>> {
     const loginType = this.checkIfItsAnEmailOrUserName(login.login);
-    return await this.userRepository.getUser(loginType, login);
+    const foundUser = await this.userRepository.getUser(loginType, login.login);
+    if (!foundUser) {
+      return {
+        status: 400,
+        message: "User Name/ Email not found.",
+        data: {},
+      };
+    }
+    const isPasswordValid = bcrypt.compare(login.password, foundUser.password!);
+    if (!isPasswordValid) {
+      return { status: 400, message: "Invalid Password", data: {} };
+    }
+    const token = this.createAccessToken(foundUser);
+    return { status: 200, message: "OK", token: token, data: {} };
   }
 
   async updateUser(
@@ -132,5 +147,12 @@ export class UserService {
       return "email";
     }
     return "name";
+  }
+
+  createAccessToken(user: UserEntity): string {
+    const secretKey = config.privateKey;
+    return jwt.sign({ id: user.id }, secretKey!, {
+      expiresIn: config.tokenExpiry,
+    });
   }
 }
