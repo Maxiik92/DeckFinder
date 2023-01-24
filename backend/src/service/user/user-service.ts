@@ -12,6 +12,7 @@ import jwt from "jsonwebtoken";
 import config from "../../../config/config";
 
 export class UserService {
+  privateKey = config.privateKey;
   constructor(public userRepository: UserRepository) {}
 
   async createUser(user: UserEntity): Promise<CustomResponse<UserEntity>> {
@@ -150,9 +151,9 @@ export class UserService {
   }
 
   createAccessToken(user: UserEntity): string {
-    const secretKey = config.privateKey;
-    return jwt.sign({ id: user.id }, secretKey!, {
+    return jwt.sign({ id: user.id }, this.privateKey, {
       expiresIn: config.tokenExpiry,
+      algorithm: "RS256",
     });
   }
 }
