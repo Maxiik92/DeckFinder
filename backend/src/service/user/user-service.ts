@@ -151,7 +151,7 @@ export class UserService {
   }
 
   createAccessToken(user: UserEntity): string {
-    return jwt.sign({ id: user.id }, this.privateKey, {
+    return jwt.sign({ id: user.id, name: user.name }, this.privateKey, {
       expiresIn: config.tokenExpiry,
       algorithm: "RS256",
     });
