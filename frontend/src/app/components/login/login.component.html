@@ -18,6 +18,9 @@
           placeholder="Enter User Name or E-Mail address"
         />
       </div>
+      <p class="invalid-input" *ngIf="invalidLogin">
+        User name / e-mail are not registered.
+      </p>
       <div class="group">
         <label for="pass"><mat-icon>lock</mat-icon></label>
         <input
@@ -31,6 +34,7 @@
           placeholder="Enter Password ( minimum 8 characters )"
         />
       </div>
+      <p class="invalid-input" *ngIf="invalidPassword">Invalid password</p>
       <div class="pass-visibility">
         <p>Show Password</p>
         <mat-icon *ngIf="!showPassword" (click)="togglePasswordVisibility()"

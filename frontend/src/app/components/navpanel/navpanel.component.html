@@ -5,8 +5,12 @@
     <button mat-stroked-button>Find Decks</button>
     <button mat-stroked-button>Build a Deck</button>
   </div>
-  <div class="log-options">
+  <div class="log-options" *ngIf="!loggedIn">
     <button mat-raised-button routerLink="login">Log In</button>
     <button mat-raised-button routerLink="register">Sign Up</button>
+  </div>
+  <div class="log-options" *ngIf="loggedIn">
+    <button mat-raised-button (click)="logOut()">Log Out</button>
+    <button mat-raised-button>{{ userName }}</button>
   </div>
 </div>
