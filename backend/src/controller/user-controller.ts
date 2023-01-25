@@ -9,12 +9,16 @@ export class UserController {
   private readonly _router: Router = Router();
 
   constructor(private userService: UserService) {
-    //check if username is available
-    this._router.get("/check", async (req: Request, res: Response) => {
-      log.info("Check user endpoint accessed.");
-      const userName: string = req.body.name as string;
-      res.json(await this.userService.checkUser(userName));
-    });
+    //check if username or email is available
+    this._router.get(
+      "/check/:type/:name",
+      async (req: Request, res: Response) => {
+        log.info("Check user input endpoint accessed.");
+        const userInput: string = req.params.name as string;
+        const checkType: string = req.params.type as string;
+        res.json(await this.userService.checkUserInput(checkType, userInput));
+      }
+    );
 
     this._router.get("/get/:id", async (req: Request, res: Response) => {
       log.info("Get user endpoint accessed.");

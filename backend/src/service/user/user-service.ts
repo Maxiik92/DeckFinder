@@ -34,12 +34,34 @@ export class UserService {
     return { status: 200, message: "OK", data: newUser };
   }
 
-  async checkUser(userName: string): Promise<CustomResponse<UserEntity>> {
-    const checkedUser = await this.userRepository.checkUser(userName);
-    if (checkedUser !== null) {
+  async checkUser(user: UserEntity): Promise<CustomResponse<UserEntity>> {
+    const checkedUserName = await this.checkUserInput("name", user.name!);
+    if (checkedUserName.status != 200) {
+      return checkedUserName;
+    }
+    const checkedUserMail = await this.checkUserInput("email", user.email!);
+    if (checkedUserMail.status != 200) {
+      return checkedUserMail;
+    }
+    return {
+      status: 200,
+      message: "OK",
+      data: {},
+    };
+  }
+
+  async checkUserInput(
+    inputType: string,
+    userInput: string
+  ): Promise<CustomResponse<Object>> {
+    const checkedUserInput = await this.userRepository.getUser(
+      inputType,
+      userInput
+    );
+    if (checkedUserInput != null) {
       return {
         status: 400,
-        message: "UserName allready in use.",
+        message: `User ${inputType} allready in use.`,
         data: {},
       };
     }
@@ -77,7 +99,10 @@ export class UserService {
         data: {},
       };
     }
-    const isPasswordValid = bcrypt.compare(login.password, foundUser.password!);
+    const isPasswordValid = await bcrypt.compare(
+      login.password,
+      foundUser.password!
+    );
     if (!isPasswordValid) {
       return { status: 400, message: "Invalid Password", data: {} };
     }
