@@ -13,10 +13,22 @@
           required
           placeholder="Enter name"
           minlength="4"
+          autofocus
+          (focusout)="checkUserInput($event)"
         />
+        <mat-icon
+          *ngIf="!nameUsed && name.valid && name.touched && !noWhiteSpace"
+          >check_circle</mat-icon
+        >
+        <mat-icon *ngIf="nameUsed || !name.valid || noWhiteSpace"
+          >block</mat-icon
+        >
       </div>
       <p class="invalid-input" *ngIf="!name.valid && name.touched">
         User name has to be at least 4 characters long!
+      </p>
+      <p class="invalid-input" *ngIf="noWhiteSpace && name.touched">
+        User name cannot contain spaces.
       </p>
       <p class="invalid-input" *ngIf="nameUsed">User name is already in use!</p>
       <div class="group">
@@ -30,11 +42,17 @@
           required
           email
           placeholder="Enter E-Mail: email@example.test"
+          (focusout)="checkUserInput($event)"
         />
+        <mat-icon *ngIf="!emailUsed && !invalidEmail && email.touched"
+          >check_circle</mat-icon
+        >
+        <mat-icon *ngIf="emailUsed || invalidEmail">block</mat-icon>
       </div>
-      <p class="invalid-input" *ngIf="!email.valid && email.touched">
+      <p class="invalid-input" *ngIf="invalidEmail && email.touched">
         Please enter a valid e-mail!
       </p>
+      <p class="invalid-input" *ngIf="emailUsed">E-mail is already in use!</p>
       <div class="group">
         <label for="pass"><mat-icon>lock</mat-icon></label>
         <input
@@ -79,7 +97,11 @@
           >visibility_off</mat-icon
         >
       </div>
-      <button class="submit-button" type="submit" [disabled]="!regForm.valid">
+      <button
+        class="submit-button"
+        type="submit"
+        [disabled]="!regForm.valid || !noErrorBeforeSubmit()"
+      >
         SUBMIT
       </button>
     </form>

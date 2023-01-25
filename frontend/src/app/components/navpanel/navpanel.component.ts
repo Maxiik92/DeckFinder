@@ -17,6 +17,7 @@ export class NavpanelComponent implements OnInit {
   }
 
   checkIfSomeoneIsLoggedIn() {
+    this.authService.saveUserNameAndId();
     const name = this.authService.getUserName;
     const id = this.authService.getUserId;
     console.log(name, id);

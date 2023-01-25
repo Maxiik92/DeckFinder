@@ -27,7 +27,13 @@ export class AuthService {
     return this.http.post<TokenResponse>(this.root + '/auth/login', user);
   }
 
-  saveUserNameAndId(token: string) {
+  saveUserNameAndId() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    if (!this.isTokenExpired()) {
+      return;
+    }
+    console.log('after Decode');
     const decodedToken: { id: string; name: string } = decode(token);
     if (decodedToken) {
       this.userId = decodedToken.id;

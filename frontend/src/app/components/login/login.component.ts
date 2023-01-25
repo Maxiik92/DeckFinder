@@ -41,7 +41,7 @@ export class LoginComponent {
           return;
         }
         localStorage.setItem('token', data.token);
-        this.authService.saveUserNameAndId(data.token);
+        this.authService.saveUserNameAndId();
         this.router.navigate(['']);
       },
       error: (err) => {
