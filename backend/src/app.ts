@@ -2,6 +2,7 @@ import express from "express";
 import "reflect-metadata";
 import cors from "cors";
 import { authRouter, userRouter } from "./route/user-route";
+import { cardRouter } from "./route/card-route";
 
 const app = express();
 const allowedDomains = ["http://localhost:4200", "http://localhost:8080"];
@@ -22,5 +23,6 @@ app.use(
 );
 app.use(authRouter);
 app.use(userRouter);
+app.use(cardRouter);
 
 export default app;
