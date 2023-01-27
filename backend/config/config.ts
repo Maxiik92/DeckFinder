@@ -26,4 +26,8 @@ export default {
     "utf8"
   ),
   tokenExpiry: process.env.TOKEN_EXPIRY,
+  battleNet: {
+    clientId: process.env.BATTLENET_ID,
+    secret: process.env.BATTLENET_SECRET,
+  },
 };

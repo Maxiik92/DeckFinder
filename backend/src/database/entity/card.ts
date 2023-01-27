@@ -10,20 +10,23 @@ export class CardEntity extends BaseEntity {
   name?: string;
 
   @Column()
-  class_id?: number;
+  classId?: number;
 
   @Column()
-  cardset_id?: number;
+  cardTypeId?: number;
 
   @Column()
-  rarity_id?: number;
+  cardsetId?: number;
 
   @Column()
-  manacost?: number;
+  rarityId?: number;
+
+  @Column()
+  manaCost?: number;
 
   @Column()
   image?: string;
 
   @Column()
-  keyword_id?: number;
+  keywordIds?: number[];
 }
