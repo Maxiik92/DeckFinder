@@ -37,10 +37,6 @@ export class GenericRepository<T extends BaseEntity>
   async create(data: T): Promise<T> {
     return this.repository.save(data);
   }
-  /*
-  async saveMultiple(data: T):Promise<T>{
-
-  }*/
 
   async update(
     id: number,

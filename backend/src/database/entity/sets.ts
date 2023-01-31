@@ -11,5 +11,5 @@ export class SetEntity {
 
   @OneToOne(() => CardEntity, (card) => card.cardsetId)
   @JoinColumn({ name: "cardsetId" })
-  card?: CardEntity;
+  card?: Promise<CardEntity[]>;
 }

@@ -1,7 +1,7 @@
 import { CardRepository } from "../../repository/card-repository";
 import config from "../../../config/config";
 import { BattleNetAccess } from "../../interfaces/battlenet";
-import { CardEntity, ClassEntity } from "../../database";
+import { CardEntity, KeywordEntity, SetEntity } from "../../database";
 import log from "../../logger";
 import { CardResponse } from "../../interfaces/card-response";
 import { ClassRepository } from "../../repository/class-repository";
@@ -10,12 +10,39 @@ import { CardTypeRepository } from "../../repository/card-type-repository";
 import { RarityRepository } from "../../repository/rarity-repository";
 import { KeywordRepository } from "../../repository/keyword-repository";
 import { RequestInfo, RequestInit } from "node-fetch";
-import { json } from "stream/consumers";
+import { EntityTarget, ObjectLiteral, Repository, Entity } from "typeorm";
 const fetch = (url: RequestInfo, init?: RequestInit) =>
   import("node-fetch").then(({ default: fetch }) => fetch(url, init));
 
 export class DatabaseService {
   private accessToken: string = "";
+  metadataInfoAndMessages = [
+    {
+      path: "classes",
+      messageInput: "Class",
+      repository: this.classRepository,
+    },
+    {
+      path: "sets",
+      messageInput: "Set",
+      repository: this.setRepository,
+    },
+    {
+      path: "rarities",
+      messageInput: "Rarity",
+      repository: this.rarityRepository,
+    },
+    {
+      path: "types",
+      messageInput: "CardType",
+      repository: this.cardTypeRepository,
+    },
+    {
+      path: "keywords",
+      messageInput: "Keyword",
+      repository: this.keywordRepository,
+    },
+  ];
 
   constructor(
     private cardRepository: CardRepository,
@@ -81,7 +108,7 @@ export class DatabaseService {
   }
 
   async saveCards(cards: CardEntity[]) {}
-
+  /*
   async getAndSaveClasses() {
     const url =
       "https://us.api.blizzard.com/hearthstone/metadata/classes?locale=en_US&access_token=" +
@@ -97,29 +124,50 @@ export class DatabaseService {
       }
     } catch {
       (err: Error) => {
-        const message = { error: "Error in getAndSaveClasses " + err };
+        const message = { error: "Error in Class DB initialisation " + err };
         log.error(message);
         return message;
       };
     }
-  }
+  }*/
 
-  async getSets() {
+  async getAndSaveTables(
+    pathFragment: string,
+    messageInput: string,
+    //this have to be refactored
+    repo:
+      | ClassRepository
+      | CardTypeRepository
+      | RarityRepository
+      | KeywordRepository
+      | SetRepository
+  ) {
     const url =
-      "https://us.api.blizzard.com/hearthstone/metadata/sets?locale=en_US&access_token=" +
+      `https://us.api.blizzard.com/hearthstone/metadata/${pathFragment}?locale=en_US&access_token=` +
       this.accessToken;
-  }
+    try {
+      const response = await fetch(url);
+      const jsonResponse = await response.json();
+      const res = await repo.create(jsonResponse);
 
-  async getCardTypes() {
-    const url =
-      "https://us.api.blizzard.com/hearthstone/metadata/types?locale=en_US&access_token=" +
-      this.accessToken;
-  }
-
-  async getRarities() {
-    const url =
-      "https://us.api.blizzard.com/hearthstone/metadata/rarities?locale=en_US&access_token=" +
-      this.accessToken;
+      if (res) {
+        const message = {
+          round: messageInput,
+          message: `${messageInput} DB initialisation was successfull.`,
+        };
+        log.info(message.message);
+        return message;
+      }
+    } catch {
+      (err: Error) => {
+        const message = {
+          round: messageInput,
+          error: `Error in ${messageInput} DB initialisation ` + err,
+        };
+        log.error(message.error);
+        return message;
+      };
+    }
   }
 
   async initDbSetup() {
@@ -127,8 +175,14 @@ export class DatabaseService {
       await this.getAccessTokenForBattleNet();
     }
     const result: { message: string }[] = [];
-    const classes = await this.getAndSaveClasses();
-    result.push(classes!);
+    for (let i: number = 0; i < this.metadataInfoAndMessages.length; i++) {
+      const output = await this.getAndSaveTables(
+        this.metadataInfoAndMessages[i].path,
+        this.metadataInfoAndMessages[i].messageInput,
+        this.metadataInfoAndMessages[i].repository
+      );
+      result.push(output!);
+    }
 
     return { data: result };
   }

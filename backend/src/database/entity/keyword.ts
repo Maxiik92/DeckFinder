@@ -14,5 +14,5 @@ export class KeywordEntity {
 
   @ManyToOne(() => CardEntity, (card) => card.keywordIds)
   @JoinColumn({ name: "keywordsId" })
-  card?: CardEntity;
+  card?: Promise<CardEntity[]>;
 }

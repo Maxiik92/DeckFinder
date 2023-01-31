@@ -1,11 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToOne,
-  PrimaryColumn,
-} from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
 import { CardEntity } from "./card";
 
 @Entity()
@@ -18,5 +11,5 @@ export class CardTypeEntity {
 
   @OneToOne(() => CardEntity, (card) => card.cardTypeId)
   @JoinColumn({ name: "cardTypeId" })
-  card?: CardEntity;
+  card?: Promise<CardEntity[]>;
 }
