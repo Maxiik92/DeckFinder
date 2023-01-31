@@ -1,8 +1,7 @@
 import { CardRepository } from "../../repository/card-repository";
-import fetch from "node-fetch";
 import config from "../../../config/config";
 import { BattleNetAccess } from "../../interfaces/battlenet";
-import { CardEntity } from "../../database/entity/card";
+import { CardEntity, ClassEntity } from "../../database";
 import log from "../../logger";
 import { CardResponse } from "../../interfaces/card-response";
 import { ClassRepository } from "../../repository/class-repository";
@@ -10,10 +9,13 @@ import { SetRepository } from "../../repository/set-repository";
 import { CardTypeRepository } from "../../repository/card-type-repository";
 import { RarityRepository } from "../../repository/rarity-repository";
 import { KeywordRepository } from "../../repository/keyword-repository";
+import { RequestInfo, RequestInit } from "node-fetch";
+import { json } from "stream/consumers";
+const fetch = (url: RequestInfo, init?: RequestInit) =>
+  import("node-fetch").then(({ default: fetch }) => fetch(url, init));
 
 export class DatabaseService {
   private accessToken: string = "";
-  cards: CardEntity[] = [];
 
   constructor(
     private cardRepository: CardRepository,
@@ -80,27 +82,56 @@ export class DatabaseService {
 
   async saveCards(cards: CardEntity[]) {}
 
-  async getClasses() {
+  async getAndSaveClasses() {
     const url =
-      "https://us.api.blizzard.com/hearthstone/metadata/classes?locale=en_US&access_token=";
+      "https://us.api.blizzard.com/hearthstone/metadata/classes?locale=en_US&access_token=" +
+      this.accessToken;
+    try {
+      const response = await fetch(url);
+      const jsonResponse = await response.json();
+      const res = await this.classRepository.create(jsonResponse);
+      if (res) {
+        const message = { message: "Class DB initialisation was successfull." };
+        log.info("Class DB initialisation was successfull.");
+        return message;
+      }
+    } catch {
+      (err: Error) => {
+        const message = { error: "Error in getAndSaveClasses " + err };
+        log.error(message);
+        return message;
+      };
+    }
   }
 
   async getSets() {
     const url =
-      "https://us.api.blizzard.com/hearthstone/metadata/sets?locale=en_US&access_token=";
+      "https://us.api.blizzard.com/hearthstone/metadata/sets?locale=en_US&access_token=" +
+      this.accessToken;
   }
 
   async getCardTypes() {
     const url =
-      "https://us.api.blizzard.com/hearthstone/metadata/types?locale=en_US&access_token=";
+      "https://us.api.blizzard.com/hearthstone/metadata/types?locale=en_US&access_token=" +
+      this.accessToken;
   }
 
   async getRarities() {
     const url =
-      "https://us.api.blizzard.com/hearthstone/metadata/rarities?locale=en_US&access_token=";
+      "https://us.api.blizzard.com/hearthstone/metadata/rarities?locale=en_US&access_token=" +
+      this.accessToken;
   }
 
-  async initDbSetup() {}
+  async initDbSetup() {
+    if (this.accessToken == "") {
+      await this.getAccessTokenForBattleNet();
+    }
+    const result: { message: string }[] = [];
+    const classes = await this.getAndSaveClasses();
+    result.push(classes!);
+
+    return { data: result };
+  }
 
   get token() {
     return this.accessToken;

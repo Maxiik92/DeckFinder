@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
+import { CardEntity } from "./card";
 
 @Entity()
 export class SetEntity {
@@ -7,4 +8,8 @@ export class SetEntity {
 
   @Column()
   name?: string;
+
+  @OneToOne(() => CardEntity, (card) => card.cardsetId)
+  @JoinColumn({ name: "cardsetId" })
+  card?: CardEntity;
 }

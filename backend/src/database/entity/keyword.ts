@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { CardEntity } from "./card";
 
 @Entity()
 export class KeywordEntity {
@@ -10,4 +11,8 @@ export class KeywordEntity {
 
   @Column()
   text?: string;
+
+  @ManyToOne(() => CardEntity, (card) => card.keywordIds)
+  @JoinColumn({ name: "keywordsId" })
+  card?: CardEntity;
 }

@@ -2,6 +2,12 @@ import config from "../../config/config";
 import log from "../logger/index";
 import { DataSource } from "typeorm";
 import { UserEntity } from "./entity/user";
+import { ClassEntity } from "./entity/class";
+import { CardEntity } from "./entity/card";
+import { RarityEntity } from "./entity/rarity";
+import { CardTypeEntity } from "./entity/card-type";
+import { KeywordEntity } from "./entity/keyword";
+import { SetEntity } from "./entity/sets";
 
 export const appDataSource = new DataSource({
   type: "mysql",
@@ -10,7 +16,15 @@ export const appDataSource = new DataSource({
   username: config.database.user,
   password: config.database.password,
   database: config.database.database,
-  entities: [UserEntity],
+  entities: [
+    UserEntity,
+    CardEntity,
+    ClassEntity,
+    RarityEntity,
+    CardTypeEntity,
+    KeywordEntity,
+    SetEntity,
+  ],
   logging: false,
   synchronize: true,
 });

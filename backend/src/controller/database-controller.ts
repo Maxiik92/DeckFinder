@@ -6,7 +6,7 @@ export class DatabaseController {
   private readonly _router: Router = Router();
 
   constructor(private dbService: DatabaseService) {
-    this._router.post("/initSetup", async (req: Request, res: Response) => {
+    this._router.post("/init", async (req: Request, res: Response) => {
       log.info("InitSetup endpoint accessed.");
       res.json(await this.dbService.initDbSetup());
     });
