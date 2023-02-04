@@ -78,36 +78,73 @@ export class DatabaseService {
   async getAllCards(callback: Function) {
     let page = 1;
     let pageCount = 2;
-    const url = `https://us.api.blizzard.com/hearthstone/cards?locale=en_US&gameMode=constructed&page=${page}&pageSize=100&access_token=`;
     try {
-      for (let i: number = 0; i < pageCount; i++) {
+      for (let i: number = 0; i < 2 /*pageCount*/; i++) {
+        let url = `https://us.api.blizzard.com/hearthstone/cards?locale=en_US&gameMode=constructed&page=${page}&pageSize=100&access_token=`;
         let errorHappened = false;
         const response = await fetch(url + this.accessToken);
         //may happen if token is not valid
         if (response.status == 401) {
           log.error("Unauthorized access to Battle.Net at getAllCards.");
           errorHappened = true;
-          return { error: "Unauthorized." };
+          return { round: "cards", error: "Unauthorized." };
         }
         //if token not valid break the for loop
         if (errorHappened) break;
 
-        const jsonResponse = (await response.json()) as CardResponse;
+        const jsonResponse = await response.json();
+        const remappedCards = this.remapCards(jsonResponse.cards);
         //if pageCount is still 2 change it to pageCount from response
         if (pageCount != jsonResponse.pageCount) {
           pageCount = jsonResponse.pageCount;
         }
         //callback is to either save all or compare and save
-        callback(jsonResponse.cards);
+        const res = await this.cardRepository.insertMultiple(remappedCards);
+
+        if (res) {
+          log.info(`Card DB page ${page} of ${pageCount} was successfull.`);
+        }
+        page++;
       }
+      return {
+        round: "cards",
+        message: "Card DB initialisation was succesfull.",
+      };
     } catch {
       (err: Error) => {
-        log.error(err);
+        const message = {
+          round: "cards",
+          error: `Error in Card DB initialisation` + err,
+        };
+        log.error(message.error);
+        return message;
       };
     }
   }
 
-  async saveCards(cards: CardEntity[]) {}
+  remapCards(cards: any) {
+    const remappedCards: CardEntity[] = [];
+    cards.forEach((card: any) => {
+      let remappedCard = new CardEntity();
+      remappedCard.id = card.id;
+      remappedCard.name = card.name;
+      remappedCard.manaCost = card.manaCost;
+      remappedCard.image = card.image;
+      remappedCard.cardTypeId = card.cardTypeId;
+      remappedCard.cardSetId = card.cardSetId;
+      remappedCard.rarityId = card.rarityId;
+      remappedCard.keywordIds = card.keywordIds;
+      remappedCard.classId = card.classId;
+      //remappedCard.multiClassIds = card.multiClassIds;
+      console.log(remappedCard);
+      remappedCards.push(card);
+    });
+    return remappedCards;
+  }
+
+  async saveCards(cards: CardEntity) {
+    return await this.cardRepository.create(cards);
+  }
   /*
   async getAndSaveClasses() {
     const url =
@@ -174,17 +211,24 @@ export class DatabaseService {
     if (this.accessToken == "") {
       await this.getAccessTokenForBattleNet();
     }
-    const result: { message: string }[] = [];
+    const result = [];
     for (let i: number = 0; i < this.metadataInfoAndMessages.length; i++) {
       const output = await this.getAndSaveTables(
         this.metadataInfoAndMessages[i].path,
         this.metadataInfoAndMessages[i].messageInput,
         this.metadataInfoAndMessages[i].repository
       );
+
       result.push(output!);
     }
+    const cardOutput = await this.getAllCards(this.saveCards);
+    result.push(cardOutput!);
 
     return { data: result };
+  }
+
+  async getCard(id: string) {
+    return await this.cardRepository.getFullCardById(parseInt(id));
   }
 
   get token() {

@@ -10,6 +10,9 @@ export class DatabaseController {
       log.info("InitSetup endpoint accessed.");
       res.json(await this.dbService.initDbSetup());
     });
+    this._router.get("/getcard/:id", async (req: Request, res: Response) => {
+      res.json(await this.dbService.getCard(req.params.id));
+    });
   }
 
   get router() {

@@ -1,5 +1,12 @@
-import { Entity, Column, OneToMany, OneToOne, JoinColumn } from "typeorm";
-import { BaseEntity } from "./baseEntity";
+import {
+  Entity,
+  Column,
+  OneToMany,
+  OneToOne,
+  JoinColumn,
+  PrimaryColumn,
+  ManyToOne,
+} from "typeorm";
 import { ClassEntity } from "./class";
 import { CardTypeEntity } from "./card-type";
 import { SetEntity } from "./sets";
@@ -7,9 +14,9 @@ import { RarityEntity } from "./rarity";
 import { KeywordEntity } from "./keyword";
 
 @Entity("card")
-export class CardEntity extends BaseEntity {
-  @Column()
-  hearthstone_id?: number;
+export class CardEntity {
+  @PrimaryColumn()
+  id?: number;
 
   @Column()
   name?: string;
@@ -20,19 +27,19 @@ export class CardEntity extends BaseEntity {
   @Column()
   image?: string;
 
-  @OneToOne(() => CardTypeEntity, (cardtype) => cardtype.id)
-  cardTypeId?: number;
+  @ManyToOne(() => CardTypeEntity, (cardType) => cardType.id)
+  cardTypeId?: CardTypeEntity;
   @JoinColumn()
-  cardType?: CardTypeEntity;
+  card?: CardEntity;
 
   @OneToOne(() => SetEntity, (set) => set.id)
-  cardsetId?: number;
+  cardSetId?: number;
   @JoinColumn()
   set?: SetEntity;
 
   @OneToOne(() => RarityEntity, (rarity) => rarity.id)
   rarityId?: number;
-  @JoinColumn()
+  @JoinColumn({ name: "rarityId" })
   rarity?: RarityEntity;
 
   @OneToMany(() => KeywordEntity, (keyword) => keyword.id)
@@ -44,4 +51,7 @@ export class CardEntity extends BaseEntity {
   classId?: number;
   @JoinColumn()
   classIds?: ClassEntity[];
+  /*
+  @Column({ type: "simple-array", nullable: true })
+  multiClassIds?: number[];*/
 }

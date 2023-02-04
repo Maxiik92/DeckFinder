@@ -10,6 +10,6 @@ export class RarityEntity {
   name?: string;
 
   @OneToOne(() => CardEntity, (card) => card.rarityId)
-  @JoinColumn({ name: "rarityId" })
+  @JoinColumn()
   card?: Promise<CardEntity[]>;
 }

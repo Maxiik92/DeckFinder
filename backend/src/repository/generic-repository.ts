@@ -1,8 +1,15 @@
-import { Repository, EntityTarget, DeleteResult, UpdateResult } from "typeorm";
-import { appDataSource } from "../database";
+import {
+  Repository,
+  EntityTarget,
+  DeleteResult,
+  UpdateResult,
+  InsertResult,
+} from "typeorm";
+import { ClassEntity, appDataSource } from "../database";
 import { BaseEntity } from "../database/entity/baseEntity";
 import { Filter } from "../database/common/filterable";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
+import { threadId } from "worker_threads";
 
 export interface IGenericRepository<T extends BaseEntity> {
   create(data: T): Promise<T>;
@@ -36,6 +43,10 @@ export class GenericRepository<T extends BaseEntity>
 
   async create(data: T): Promise<T> {
     return this.repository.save(data);
+  }
+
+  async insertMultiple(data: QueryDeepPartialEntity<T>): Promise<InsertResult> {
+    return this.repository.upsert(data, { conflictPaths: ["id"] });
   }
 
   async update(

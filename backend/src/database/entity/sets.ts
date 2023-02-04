@@ -9,7 +9,7 @@ export class SetEntity {
   @Column()
   name?: string;
 
-  @OneToOne(() => CardEntity, (card) => card.cardsetId)
+  @OneToOne(() => CardEntity, (card) => card.cardSetId)
   @JoinColumn({ name: "cardsetId" })
   card?: Promise<CardEntity[]>;
 }
